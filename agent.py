@@ -127,5 +127,5 @@ root_agent = Agent(
     model="gemini-3.5-flash",
     description="Agent to answer questions about the time and weather in a city.",
     instruction="You are a helpful agent who can answer user questions about the time and weather in a city.",
-    tools=[get_weather, get_current_time, memory_retrieval_tools]
+    tools=[get_weather, get_current_time] + memory_retrieval_tools
 )

@@ -46,12 +46,23 @@ uv pip install -e .
 ```
 
 ### 3. 환경 변수 설정 (`.env`)
-프로젝트 루트 경로에 `.env` 파일을 생성하고 아래 양식에 맞게 Google Cloud 프로젝트 설정 및 GCS 스테이징 버킷 경로 정보를 기입합니다:
+`.env.template` 파일을 복사하여 `.env` 파일을 생성하고, `sed` 명령어를 이용해 실제 GCP 프로젝트 ID와 GCS 버킷 URI 값을 설정합니다:
+
+```bash
+# .env.template 복사하여 .env 생성
+cp .env.template .env
+
+# sed를 활용한 환경변수 값 일괄 할당 (실제 값으로 치환하여 사용하세요)
+sed -i 's/YOUR_GOOGLE_CLOUD_PROJECT/gcp-sandbox-kwlee/g' .env
+sed -i 's|YOUR_STAGING_BUCKET_URI|gs://adk-sandbox-bucket|g' .env
+```
+
+`.env` 파일이 다음과 같이 실제 값으로 올바르게 채워졌는지 확인합니다:
 
 ```ini
-GOOGLE_CLOUD_PROJECT="YOUR-GCP-PROJECT-ID"
+GOOGLE_CLOUD_PROJECT="gcp-sandbox-kwlee"
 GCP_RESOURCES_LOCATION="us-central1"
-STAGING_BUCKET_URI="gs://YOUR-STAGING-BUCKET-NAME"
+STAGING_BUCKET_URI="gs://adk-sandbox-bucket"
 ```
 
 ### 4. Vertex AI Agent Engine에 배포
@@ -60,5 +71,6 @@ STAGING_BUCKET_URI="gs://YOUR-STAGING-BUCKET-NAME"
 ```bash
 python agent_runtime.py
 ```
+
 
 배포가 성공적으로 완료되면 터미널 출력 하단에 생성된 **Agent Identity (서비스 어카운트 주소)** 및 해당 계정에 부여해야 하는 **IAM 권한 부여 명령어(gcloud)** 리스트가 출력됩니다. 출력되는 명령어 가이드에 따라 서비스 계정에 필요한 GCP 권한 권한을 부여해 주어야 에이전트가 정상적으로 구동됩니다.

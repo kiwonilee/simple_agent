@@ -31,19 +31,20 @@ memory_bank_config = {
     },
     # Default Model for Memory Bank is gemini-2.5-flash
     "generation_config": {
-        "model": "projects/${PROJECT}/locations/global/publishers/google/models/gemini-3.5-flash",
+        "model": f"projects/{PROJECT_ID}/locations/global/publishers/google/models/gemini-3.5-flash",
     },
     # Default for Similarity Search Model is text-embedding-005
     # text-embedding-005 is supported only English, but gemini-embedding-2 is supported multilingual.  
     "similarity_search_config": {
-        "embedding_model": "projects/${PROJECT}/locations/global/publishers/google/models/gemini-embedding-2"
+        "embedding_model": f"projects/{PROJECT_ID}/locations/global/publishers/google/models/gemini-embedding-2"
     },
-    # Only use the latest memory revision of each candidate memory during consolidation.    
-    # 메모리 뱅크는 새로운 기억을 추가할지, 기존 기억에 추가적인 맥락을 더할지, 또는 더 이상 필요 없는 기억을 삭제할지 평가
-    # 기본값은 최신 한개만 존재 (1), 반복 학습을 통해 일관성과 신뢰도는 증가하지만, 토큰 소모량 증가
-    "consolidation_customization": {
-        "revisions_per_candidate_count": 3
-    }
+    "customization_configs": [
+        {
+            "consolidation_config": {
+                "revisions_per_candidate_count": 3
+            }
+        }
+    ]
 }
 
 # # Create a new resource with your agent deployed to Agent Runtime.
@@ -62,7 +63,7 @@ remote_agent = client.agent_engines.create(
         "resource_limits": {"cpu": "1", "memory": "1Gi"},
         # recommend : 2 * cpu+ 1
         "container_concurrency": 9,
-        "gcs_dir_name": STAGING_BUCKET,
+        "staging_bucket": STAGING_BUCKET,
         "extra_packages": ["agent.py"],
         "requirements": [
             # See https://pypi.org/project/google-cloud-aiplatform for the latest version.
@@ -103,7 +104,7 @@ for role in [
     "roles/aiplatform.user",
     "roles/serviceusage.serviceUsageConsumer",
     # for agent relationship
-    "roles/apptopology.viewer"
+    "roles/apptopology.viewer",
     "roles/agentregistry.viewer",
     # for agent trace
     "roles/cloudtrace.user",
