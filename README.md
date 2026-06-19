@@ -42,30 +42,38 @@ uv venv
 source .venv/bin/activate
 
 # 의존성 패키지 동기화 및 가용화
-uv pip install -e .
+uv sync
 ```
 
 ### 3. 환경 변수 설정 (`.env`)
 `.env.template` 파일을 복사하여 `.env` 파일을 생성하고, `sed` 명령어를 이용해 실제 GCP 프로젝트 ID와 GCS 버킷 URI 값을 설정합니다:
 
 ```bash
+export PROJECT_ID=""
+export GCS_BUCKET=""  # gs://xxxx
+```
+
+```bash
 # .env.template 복사하여 .env 생성
 cp .env.template .env
 
 # sed를 활용한 환경변수 값 일괄 할당 (실제 값으로 치환하여 사용하세요)
-sed -i 's/YOUR_GOOGLE_CLOUD_PROJECT/gcp-sandbox-kwlee/g' .env
-sed -i 's|YOUR_STAGING_BUCKET_URI|gs://adk-sandbox-bucket|g' .env
+sed -i "s/YOUR_GOOGLE_CLOUD_PROJECT/${PROJECT_ID}/g" .env
+sed -i "s|YOUR_STAGING_BUCKET_URI|${GCS_BUCKET}|g" .env
 ```
 
-`.env` 파일이 다음과 같이 실제 값으로 올바르게 채워졌는지 확인합니다:
+`.env` 파일이 실제 값으로 올바르게 채워졌는지 확인합니다:
 
-```ini
-GOOGLE_CLOUD_PROJECT="gcp-sandbox-kwlee"
-GCP_RESOURCES_LOCATION="us-central1"
-STAGING_BUCKET_URI="gs://adk-sandbox-bucket"
+
+### 4. GCS 스테이징 버킷 생성
+Vertex AI Agent Engine 배포 시 에이전트 소스코드 등을 저장할 스테이징 버킷이 필요합니다. GCS 버킷이 아직 없다면 아래와 같이 생성합니다:
+
+```bash
+gcloud storage buckets create ${GCS_BUCKET} --location=us-central1
 ```
 
-### 4. Vertex AI Agent Engine에 배포
+
+### 5. Vertex AI Agent Engine에 배포
 `agent_runtime.py` 스크립트를 실행하면 ADK로 정의된 에이전트가 패키징되어 GCP 클라우드 환경(Agent Runtime)에 자동으로 빌드 및 배포됩니다:
 
 ```bash

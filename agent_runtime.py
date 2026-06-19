@@ -89,28 +89,26 @@ remote_agent = client.agent_engines.create(
     }
 )
 
-
-
-
 print("\n✅ Deployment successful!")
 print(f"Remote Agent Name: {remote_agent.api_resource.name}")
 effective_identity = remote_agent.api_resource.spec.effective_identity
 print(f"Agent Identity: {effective_identity}")
 
 print("\n[ 🔒 Required IAM Role Assignment Commands ]")
-print("# Grant as following permissions to the Agent Identity:")
-for role in [
+print("# Run the following commands to grant required permissions to the Agent Identity:")
+print(f"export AGENT_IDENTITY=\"{effective_identity}\"\n")
+
+roles = [
     "roles/aiplatform.viewer",
     "roles/aiplatform.user",
     "roles/serviceusage.serviceUsageConsumer",
-    # for agent relationship
-    "roles/apptopology.viewer",
-    "roles/agentregistry.viewer",
-    # for agent trace
-    "roles/cloudtrace.user",
-    # for agent log
-    "roles/logging.viewer"
-]:
+    "roles/apptopology.viewer",    # for agent relationship
+    "roles/agentregistry.viewer",  # for agent relationship
+    "roles/cloudtrace.user",       # for agent trace
+    "roles/logging.viewer",        # for agent log
+]
+
+for role in roles:
     print(f"gcloud projects add-iam-policy-binding {PROJECT_ID} \\")
-    print(f"    --member=\"principal://{effective_identity}\" \\")
+    print(f"    --member=\"principal://$AGENT_IDENTITY\" \\")
     print(f"    --role=\"{role}\"")
