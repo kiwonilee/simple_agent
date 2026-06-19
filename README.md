@@ -32,7 +32,7 @@ Google Cloud Console에 접속하여 **Agent Platform** 메뉴로 이동한 뒤,
 ### 2. 코드 다운로드 (Git Clone)
 GitHub에서 프로젝트 저장소를 클론합니다:
 ```bash
-git clone git@github.com:kiwonlee/simple_agent.git
+git clone https://github.com/kiwonilee/simple_agent.git
 cd simple_agent
 ```
 
@@ -52,8 +52,8 @@ uv sync
 `.env.template` 파일을 복사하여 `.env` 파일을 생성하고, `sed` 명령어를 이용해 실제 GCP 프로젝트 ID와 GCS 버킷 URI 값을 설정합니다:
 
 ```bash
-export PROJECT_ID=""
-export GCS_BUCKET=""  # gs://xxxx
+export PROJECT_ID=
+export GCS_BUCKET=gs://  # gs://xxxx
 ```
 
 ```bash

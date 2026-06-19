@@ -12,86 +12,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import urllib.parse
-import urllib.request
+import datetime
+from zoneinfo import ZoneInfo
 from google.adk.agents import Agent
 from google.adk.agents.callback_context import CallbackContext
 # from google.adk.tools.load_memory_tool import LoadMemoryTool
 from google.adk.tools.preload_memory_tool import PreloadMemoryTool
 
 def get_weather(city: str) -> dict:
-    """Gets the current weather for a given city.
-
-    Args:
-        city: The city name in English (e.g., 'New York', 'Seoul', 'London').
-    """
-    encoded_city = urllib.parse.quote(city.strip())
-    geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={encoded_city}&count=1&language=en&format=json"
-    
-    try:
-        req = urllib.request.Request(geo_url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req) as response:
-            geo_data = json.loads(response.read().decode())
-            results = geo_data.get("results")
-            if not results:
-                return {"status": "error", "error_message": f"City '{city}' not found."}
-            
-            location = results[0]
-            lat = location.get("latitude")
-            lon = location.get("longitude")
-            name = location.get("name")
-            country = location.get("country")
-            
-        weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m"
-        
-        req = urllib.request.Request(weather_url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req) as response:
-            weather_data = json.loads(response.read().decode())
-            current = weather_data.get("current")
-            if not current:
-                return {"status": "error", "error_message": "Could not parse weather data."}
-            
-            temp = current.get("temperature_2m")
-            humidity = current.get("relative_humidity_2m")
-            apparent_temp = current.get("apparent_temperature")
-            wind_speed = current.get("wind_speed_10m")
-            
-            report = (
-                f"The current weather in {name}, {country} is: "
-                f"Temperature: {temp}°C (Apparent: {apparent_temp}°C), "
-                f"Humidity: {humidity}%, "
-                f"Wind Speed: {wind_speed} km/h."
-            )
-            return {"status": "success", "report": report}
-            
-    except Exception as e:
+    if city.lower() == "new york":
+        return {
+            "status": "success",
+            "report": "The weather in New York is sunny with a temperature of 25 degrees Celsius (77 degrees Fahrenheit).",
+        }
+    else:
         return {
             "status": "error",
-            "error_message": f"Could not retrieve weather for city '{city}': {str(e)}",
+            "error_message": f"Weather information for '{city}' is not available.",
         }
 
-
-def get_current_time(timezone: str) -> dict:
-    """Gets the current time for a given IANA timezone.
-
-    Args:
-        timezone: The IANA timezone identifier (e.g., 'America/New_York', 'Asia/Seoul', 'Europe/London').
-    """
-    encoded_tz = urllib.parse.quote(timezone.strip())
-    url = f"https://timeapi.io/api/Time/current/zone?timeZone={encoded_tz}"
-    
-    try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req) as response:
-            data = json.loads(response.read().decode())
-            report = f"The current time in {timezone} is {data.get('dateTime')} ({data.get('dayOfWeek')})."
-            return {"status": "success", "report": report}
-    except Exception as e:
+def get_current_time(city: str) -> dict:
+    if city.lower() == "new york":
+        tz_identifier = "America/New_York"
+    else:
         return {
             "status": "error",
-            "error_message": f"Could not retrieve time for timezone '{timezone}': {str(e)}",
+            "error_message": f"Sorry, I don't have timezone information for {city}.",
         }
+
+    tz = ZoneInfo(tz_identifier)
+    now = datetime.datetime.now(tz)
+    report = (
+        f'The current time in {city} is {now.strftime("%Y-%m-%d %H:%M:%S %Z%z")}'
+    )
+    return {"status": "success", "report": report}
 
 # https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/adk-quickstart#manage-memories
 async def add_session_to_memory_callback(callback_context: CallbackContext):
@@ -109,7 +63,6 @@ async def generate_memories_callback(callback_context: CallbackContext):
     # It's recommended to only call this at the end of a session to minimize
     # how many times a single event is re-processed.
     # await callback_context.add_session_to_memory()
-
     return None
 
 # https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/adk-quickstart?hl=ko#define_a_memory_retrieval_tool
@@ -118,9 +71,8 @@ memory_retrieval_tools = [
   PreloadMemoryTool(),
   # Option 2: Retrieve memories via tool calls. The model will only call this tool
   # when it decides that memories are necessary to respond to the user query.
-#   LoadMemoryTool()
+  # LoadMemoryTool()
 ]
-
 
 root_agent = Agent(
     name="weather_time_agent",
