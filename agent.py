@@ -65,19 +65,12 @@ async def generate_memories_callback(callback_context: CallbackContext):
     # await callback_context.add_session_to_memory()
     return None
 
-# https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/adk-quickstart?hl=ko#define_a_memory_retrieval_tool
-memory_retrieval_tools = [
-  # Option 1: Retrieve memories at the start of every turn.
-  PreloadMemoryTool(),
-  # Option 2: Retrieve memories via tool calls. The model will only call this tool
-  # when it decides that memories are necessary to respond to the user query.
-  # LoadMemoryTool()
-]
-
 root_agent = Agent(
     name="weather_time_agent",
     model="gemini-3.5-flash",
     description="Agent to answer questions about the time and weather in a city.",
     instruction="You are a helpful agent who can answer user questions about the time and weather in a city.",
-    tools=[get_weather, get_current_time] + memory_retrieval_tools
+    after_agent_callback=generate_memories_callback,
+    # https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/adk-quickstart?hl=ko#define_a_memory_retrieval_tool
+    tools=[get_weather, get_current_time, PreloadMemoryTool()]
 )
