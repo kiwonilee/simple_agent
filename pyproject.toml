@@ -8,4 +8,5 @@ dependencies = [
     "google-cloud-aiplatform[agent_engines,adk]",
     "pydantic",
     "cloudpickle==3.0",
+    "python-dotenv",
 ]

@@ -1,14 +1,17 @@
 import os
 import sys
 import vertexai
+from dotenv import load_dotenv
 from vertexai import types
 from vertexai.agent_engines import AdkApp
 from agent import root_agent as agent
 
+load_dotenv()
+
 # Configuration parameters
-PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "gcp-sandbox-kwlee")
-LOCATION = os.environ.get("GCP_RESOURCES_LOCATION", "us-central1")
-STAGING_BUCKET = os.environ.get("STAGING_BUCKET_URI", "gs://adk-sandbox-bucket")
+PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT")
+LOCATION = os.environ.get("GCP_RESOURCES_LOCATION")
+STAGING_BUCKET = os.environ.get("STAGING_BUCKET_URI")
 
 # Initialize the Agent Platform client with v1beta1 API for agent identity support
 # https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity#create-agent-identity
