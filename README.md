@@ -26,14 +26,17 @@ simple_agent/
 
 ## ⚙️ 환경 설정 및 배포 방법
 
-### 1. 코드 다운로드 (Git Clone)
+### 1. Agent Platform API 활성화
+Google Cloud Console에 접속하여 **Agent Platform** 메뉴로 이동한 뒤, 화면 상단에 있는 **Enable API** 버튼을 클릭하여 에이전트 구동에 필요한 API들을 활성화해주세요.
+
+### 2. 코드 다운로드 (Git Clone)
 GitHub에서 프로젝트 저장소를 클론합니다:
 ```bash
 git clone git@github.com:kiwonlee/simple_agent.git
 cd simple_agent
 ```
 
-### 2. 가상환경 구성 (`uv` 사용)
+### 3. 가상환경 구성 (`uv` 사용)
 [uv](https://github.com/astral-sh/uv)는 초고속 Python 패키지 인스톨러 및 프로젝트 관리자입니다. `uv`가 설치되어 있지 않다면 설치한 후 아래 명령을 수행하세요:
 
 ```bash
@@ -45,7 +48,7 @@ source .venv/bin/activate
 uv sync
 ```
 
-### 3. 환경 변수 설정 (`.env`)
+### 4. 환경 변수 설정 (`.env`)
 `.env.template` 파일을 복사하여 `.env` 파일을 생성하고, `sed` 명령어를 이용해 실제 GCP 프로젝트 ID와 GCS 버킷 URI 값을 설정합니다:
 
 ```bash
@@ -65,7 +68,7 @@ sed -i "s|YOUR_STAGING_BUCKET_URI|${GCS_BUCKET}|g" .env
 `.env` 파일이 실제 값으로 올바르게 채워졌는지 확인합니다:
 
 
-### 4. GCS 스테이징 버킷 생성
+### 5. GCS 스테이징 버킷 생성
 Vertex AI Agent Engine 배포 시 에이전트 소스코드 등을 저장할 스테이징 버킷이 필요합니다. GCS 버킷이 아직 없다면 아래와 같이 생성합니다:
 
 ```bash
@@ -73,11 +76,11 @@ gcloud storage buckets create ${GCS_BUCKET} --location=us-central1
 ```
 
 
-### 5. Vertex AI Agent Engine에 배포
+### 6. Vertex AI Agent Engine에 배포
 `agent_runtime.py` 스크립트를 실행하면 ADK로 정의된 에이전트가 패키징되어 GCP 클라우드 환경(Agent Runtime)에 자동으로 빌드 및 배포됩니다:
 
 ```bash
-python agent_runtime.py
+uv run agent_runtime.py
 ```
 
 
